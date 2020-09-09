@@ -2,7 +2,7 @@
 
 use Phpmig\Migration\Migration;
 
-class CreateTodo extends Migration
+class CreateThread extends Migration
 {
     /**
      * Do the migration
