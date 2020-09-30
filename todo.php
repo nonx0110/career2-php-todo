@@ -68,7 +68,7 @@ class Todo
     }
 
     /**
-     * タスクを削除する
+     * タスクを全て削除する
      */
     public function delete()
     {
