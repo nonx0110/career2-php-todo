@@ -42,6 +42,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <label for="due_date">期限</label>
                 <input type="text" class="form-control" name="due_date" id="due_date" required>
             </div>
+
+            <p>アップロード画像</p>
+            <input type="file" name="image">
             <br><br>
             <input type="hidden" name="token" value="<?php echo $_SESSION['token']; ?>">
             <input class="btn btn-primary"  type="submit" name="btn" value="TODOを作成する">
