@@ -4,14 +4,18 @@ require_once './todo.php';
 $todo = new Todo();
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    if (isset($_POST["method"]) && $_POST["method"] === "DELETE_All") {
+    if (isset($_POST["method"]) && $_POST["method"] === "DELETE_ALL") {
         $todo->deleteAll();
+
     } elseif (isset($_POST["method"]) && $_POST["method"] === "DELETE") {
         $todo->delete($_POST["todo_id"]);
+
     } elseif (isset($_POST["method"]) && $_POST["method"] === "UPDATE") {
         $todo->update($_POST["todo_id"], $_POST['status']);
+
     } else {
-        $todo->post($_POST['title'], $_POST['due_date']);
+        $todo->post($_POST['title'], $_POST['due_date'], $_FILES['image']);
+
     }
 }
 ?>
@@ -29,11 +33,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <body>
 
 <div class="container">
-    <div class="col-md-8">
+    <div class="col-md-12">
         <h1 class="text-center text-primary py-3">TODO App</h1>
 
         <h2 class="text-muted py-3">TODO作成</h2>
-        <form method="POST" action="<?php print($_SERVER['PHP_SELF']) ?>">
+        <form method="POST" enctype="multipart/form-data"  action="<?php print($_SERVER['PHP_SELF']) ?>">
             <div class="form-group">
                 <label for="title">タスク名</label>
                 <input type="text" class="form-control" name="title" id="title" placeholder="タスク名" required>
@@ -42,7 +46,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <label for="due_date">期限</label>
                 <input type="text" class="form-control" name="due_date" id="due_date" required>
             </div>
-
             <p>アップロード画像</p>
             <input type="file" name="image">
             <br><br>
@@ -54,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         <h2 class="text-muted py-3">やること一覧</h2>
         <form method="POST" action="<?php print($_SERVER['PHP_SELF']) ?>">
-            <input type="hidden" name="method" value="DELETE_All">
+            <input type="hidden" name="method" value="DELETE_ALL">
             <button class="btn btn-danger" type="submit">TODOを全削除する</button>
         </form>
         <?php
@@ -64,6 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <thead>
             <tr>
                 <th>タイトル</th>
+                <th>画像</th>
                 <th>期限</th>
                 <th>状態</th>
                 <th>更新</th>
@@ -76,19 +80,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 ?>
                 <tr>
                     <form method="POST" action="<?php print($_SERVER['PHP_SELF']) ?>">
-                        <td><?=$todo['title']; ?></td>
+                        <td  style="width: 300px"><?=$todo['title']; ?></td>
+                        <td>
+                            <?php
+                            if (isset($todo['image'])) {
+                                $image = $todo['image'];
+                                echo "<img src='upload/$image'; width='100'/>";
+                            } else {
+                                echo "---";
+                            }
+                            ?>
+                        </td>
                         <td><?=$todo['due_date']; ?></td>
                         <td class="label">
                             <label>
                                 <select name="status" class="form-control">
                                     <?php
                                     foreach (Todo::STATUS as $key => $label) {
-                                         $is_selected = $key === $todo["status"] ? "selected": "";
-                                         echo "<option value='$key' $is_selected>$label</option>";
+                                        $is_selected = $key === $todo["status"] ? "selected": "";
+                                        echo "<option value='$key' $is_selected>$label</option>";
                                     }
                                     ?>
-                             </select>
-                         </label>
+                                </select>
+                            </label>
                         </td>
                         <td>
                             <input type="hidden" name="method" value="UPDATE">
@@ -97,7 +111,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         </td>
                     </form>
                     <td>
-                        <form>
+                        <form method="POST" action="<?php print($_SERVER['PHP_SELF']) ?>">
                             <input type="hidden" name="method" value="DELETE">
                             <input type="hidden" name="todo_id" value="<?=$todo["id"]; ?>">
                             <button class="btn btn-danger" type="submit">削除</button>
